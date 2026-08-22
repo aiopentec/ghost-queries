@@ -36,8 +36,8 @@ jobs:
         run: |
           git config user.name "GhostQuery Bot"
           git config user.email "actions@github.com"
-          git add _posts/ processed_questions.json
-          git commit -m "Autonomous AI post" || echo "No changes to commit"
+          git add _posts/ processed_questions.json 2>/dev/null || true
+          git diff --cached --quiet && echo "No changes to commit" || git commit -m "Autonomous AI post"
           git push
 
   deploy:
