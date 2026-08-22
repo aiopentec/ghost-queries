@@ -1,4 +1,5 @@
 import requests
+import time
 import json
 import os
 import re
@@ -51,22 +52,28 @@ def get_unanswered_question(processed_ids):
     return None
 
 
-def generate_solution(question):
+def generate_solution(question, max_retries=3):
     prompt = f"""You are an expert developer. A user asked this question and never got an answer:
 Title: {question['title']}
 Body: {question['body'][:2000]}
 
 Write a clear, step-by-step technical solution in Markdown format. Do not include
 any affiliate links, disclosures, or sign-offs — those will be added separately."""
-    try:
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt,
-        )
-        return response.text
-    except Exception as e:
-        print(f"Gemini API error: {e}")
-        return None
+
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-flash-latest",
+                contents=prompt,
+            )
+            return response.text
+        except Exception as e:
+            wait = 2 ** attempt * 5
+            print(f"Gemini API error (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                print(f"Retrying in {wait}s...")
+                time.sleep(wait)
+    return None
 
 
 def slugify(title):
