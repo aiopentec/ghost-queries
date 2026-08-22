@@ -100,7 +100,7 @@ def save_to_website(question, solution):
     attribution = f"\n\n*Originally asked on [Stack Overflow]({so_link}).*"
 
     content = (
-        f"---\nlayout: post\ntitle: \"{question['title']}\"\n---\n"
+        f"---\nlayout: post\ntitle: \"{question['title']}\"\nauthor: GhostQuery Bot\n---\n"
         f"{solution}{affiliate_block}{attribution}{disclosure}"
     )
 
