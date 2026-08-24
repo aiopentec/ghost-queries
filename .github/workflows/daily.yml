@@ -48,7 +48,12 @@ jobs:
           git config user.email "actions@github.com"
           # Pull immediately before committing, since the previous matrix
           # job in this sequential run just pushed its own commit.
-          git pull --rebase origin main
+          # --autostash is required here: main.py has already written the
+          # new post + rewritten processed_questions_{site}.json by this
+          # point, so the working tree is dirty and a plain `pull --rebase`
+          # refuses to run. --autostash stashes those changes, rebases,
+          # then reapplies them on top.
+          git pull --rebase --autostash origin main
           git add _posts/ processed_questions_*.json 2>/dev/null || true
           git diff --cached --quiet && echo "No changes to commit" || git commit -m "Autonomous AI post (${{ matrix.site }})"
           git push
